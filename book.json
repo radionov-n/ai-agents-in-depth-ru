@@ -130,7 +130,7 @@
             "params": {
               "tracks": [
                 {"label": "Workflow", "steps": ["Plan", "Run", "Done"]},
-                {"label": "Agent", "steps": ["Observe", "Act", "Adapt"]}
+                {"label": "Agent", "steps": ["Observe", "Act", "Adapt"], "loop": true}
               ],
               "cap": "Choose autonomy by uncertainty; hybridize when needed"
             },
@@ -542,6 +542,7 @@
             "component": "radial_roles",
             "params": {
               "center": "Code",
+              "direction": "out",
               "roles": [
                 "Thinking",
                 "Policy",
@@ -960,7 +961,7 @@
               "tracks": [
                 {"label": "Cascade", "steps": ["VAD", "ASR", "LLM", "TTS"]},
                 {"label": "Streaming", "steps": ["Partial", "Generate", "Speak"]},
-                {"label": "Duplex", "steps": ["Listen", "Think", "Speak", "Listen"]}
+                {"label": "Duplex", "steps": ["Listen", "Think", "Speak", "Listen"], "loop": true}
               ],
               "cap": "From turn-taking pipeline to simultaneous listen + speak"
             },
@@ -1000,6 +1001,7 @@
             "component": "radial_roles",
             "params": {
               "center": "Screen",
+              "direction": "in",
               "roles": [
                 "DOM",
                 "SoM",
@@ -1024,8 +1026,12 @@
             "params": {
               "tracks": [
                 {"label": "Voice", "steps": ["Hear", "Reply 0.58s"]},
-                {"label": "Computer", "steps": ["Plan", "Act", "Verify"]},
-                {"label": "Status", "steps": ["Step", "Missing", "Done gate"]}
+                {"label": "Status", "steps": ["Step", "Missing", "Done gate"]},
+                {"label": "Computer", "steps": ["Plan", "Act", "Verify"]}
+              ],
+              "cross_links": [
+                {"from": [2, 2], "to": [1, 2]},
+                {"from": [1, 2], "to": [0, 1]}
               ],
               "cap": "Fast conversation never claims completion before verification"
             },
@@ -1171,6 +1177,7 @@
               "steps": ["Source", "Glossary", "Agents", "Output"],
               "gate": 2,
               "blocked": "independent evidence",
+              "mode": "verify",
               "cap": "A cross-check must break the semantic error chain"
             },
             "title_ru": "Визуальная модель: Локализация сбоев и независимая перекрёстная проверка",
@@ -1189,7 +1196,7 @@
             "params": {
               "tracks": [
                 {"label": "Society", "steps": ["Agents", "Norms", "Emergence"]},
-                {"label": "Co-evolve", "steps": ["Tasks", "Harness", "Eval", "Model"]}
+                {"label": "Co-evolve", "steps": ["Tasks", "Harness", "Eval", "Model"], "loop": true}
               ],
               "cap": "Model and Harness move together"
             },
