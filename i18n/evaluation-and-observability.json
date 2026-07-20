@@ -1,0 +1,42 @@
+{
+  "section_id": "evaluation-and-observability",
+  "intro_en": "Evaluation turns agent development from a demonstration of favorable examples into a reproducible scientific process. It requires diagnostic tasks, sound metrics, calibrated automated judging, complete tracing, and infrastructure that connects each observation to the next testable hypothesis.",
+  "concepts": [
+    {
+      "id": "reproducible-evaluation-environments",
+      "explanation_en": "The object under evaluation is the combination of the model and the Harness. The environment must define the dataset, resettable state, atomic tools, rubric, and termination protocol so that the same test can be repeated after a change to the model, prompt, or tool. Tool-calling tasks are best checked with executable verifiers; interactive tasks require a combination of system state and dialogue content. In the order-refund example, the agent must request Order #12345, apply the rule granting a full refund within seven days, call process_refund for ¥299, and report the refund ID and ETA. For dialogue tasks, τ-bench has the user reveal information gradually, while τ²-bench adds a Dual-Control Environment in which both the agent and the user simulator can modify the shared environment. Extrapolation: For external APIs, a record/replay mode with versioned responses can help distinguish agent regressions from provider drift.",
+      "analogy_en": "This is not an oral examination but a test bench: the scenario, instruments, initial state, and acceptance criteria are fixed before the run begins.",
+      "visual_title_en": "Visual Model: Reproducible Evaluation Environment"
+    },
+    {
+      "id": "diagnostic-task-dataset-design",
+      "explanation_en": "A task set must simultaneously provide clear objectives, realism, reproducibility, diversity, a hierarchy of difficulty, machine verifiability, and resistance to leakage. An aggregate success rate is not enough: tasks are labeled with capability tags, scenarios, traps, and boundaries so that a failure points to a specific deficit. SWE-Bench Verified filtered out 500 high-quality tasks with reliable FAIL_TO_PASS and PASS_TO_PASS tests; AndroidWorld uses parameterized templates and checks the final UI state; τ²-bench separates known information from task instructions; Terminal-Bench verifies artifacts and execution in Docker and adds a canary GUID to detect leakage. OSWorld-Verified shows that the benchmark itself requires continuous repair of its environment, task wording, and verifiers. Extrapolation: For every release, it is useful to publish a dataset card describing coverage, sources, the period of validity, and known blind spots.",
+      "analogy_en": "The environment is the stage and the dataset is the script: a poor script turns even a perfectly equipped theater into a source of noise.",
+      "visual_title_en": "Visual Model: Diagnostic Evaluation Dataset Design"
+    },
+    {
+      "id": "metrics-and-statistical-evidence",
+      "explanation_en": "Evaluation must observe both the trajectory and the final state: the legality and correctness of calls, path efficiency, retrieval coverage, latency and cost, task success, safety, and robustness. Pass@k measures the chance of at least one success, Pass^k the consistency of success across all attempts, and Best@k the quality ceiling. Every comparison should include repeated runs, dispersion, and a significance test. With Pass@1 = 0.6, the book obtains Pass@5 ≈ 99% but Pass^5 ≈ 7.8%: the agent can find a successful path, yet it is unreliable. For 100 tasks and a 70% success rate, the standard error is about 4.6%, with an approximate 95% interval of ±9 percentage points; a difference between 73% and 70% does not establish an improvement. Extrapolation: A preregistered analysis plan reduces the risk of choosing a metric or slice after seeing the results.",
+      "analogy_en": "Pass@k asks whether a shooter can hit the target at least once; Pass^k asks whether the shooter will hit it every time when an error is unacceptable.",
+      "visual_title_en": "Visual Model: Process–Outcome Metrics and Statistical Significance"
+    },
+    {
+      "id": "calibrated-automated-judging",
+      "explanation_en": "For open-ended outputs, LLM-as-a-Judge scales an expert rubric, but the judge is itself a measuring instrument subject to length bias, drift, position bias, and reward hacking. The rubric must be expert-designed, comprehensive, weighted, and self-contained; critical errors should act as vetoes. The judge is calibrated against a human gold set and checked for agreement, while comparative decisions are repeated with the candidates’ positions reversed. The rubric for a user-memory agent separately evaluates factual correctness, completeness, reasoning correctness, and a hallucination veto on a question about the daughter’s pediatrician. The chapter proposes a gold set of roughly 100–200 cases and Cohen’s kappa for agreement, with an illustrative threshold above 0.7. For model ranking, Elo/Bradley–Terry converts many pairwise choices into relative ratings; the LLM judge must assess both A/B and B/A, or position bias will distort the result. Extrapolation: Storing the judge version, rubric hash, and raw rationale alongside the score makes rescoring reproducible when the judge changes.",
+      "analogy_en": "A model judge is a measuring instrument: before using it at scale, you calibrate it against a reference standard and regularly check it for drift.",
+      "visual_title_en": "Visual Model: Rubric-Calibrated LLM Judge and Pairwise Comparison"
+    },
+    {
+      "id": "observability-to-regression-loop",
+      "explanation_en": "Observability turns an individual run into a trace tree: every LLM call, tool call, and retrieval becomes a span containing its input and output, duration, token usage, cost, and error. Traces make it possible to distinguish an agent defect from an environment or scorer failure, identify loops and expensive paths, and then turn real failures into cleaned regression cases. The chapter connects OpenTelemetry to the span-tree model and OpenInference to LLM-specific semantics. The AndroidWorld baseline and the assumed H1/H3/H4/H5/H6 results are a hypothetical teaching example, not a published benchmark: H1–H4 are presented as parallel checks, H5/H6 as a separate conditional 2×2 experiment, H2 has no numerical result, and H7/H8 remain untested hypotheses for the next iteration. Extrapolation: Automatically drafted regression cases created from anomalous traces should pass through human triage so that noise is not frozen into the specification.",
+      "analogy_en": "A trace is the medical record of one execution, a dashboard is the system’s epidemiology, and a regression test is a vaccine against an error already encountered.",
+      "visual_title_en": "Visual Model: Agent Observability and the Evaluation Feedback Loop"
+    },
+    {
+      "id": "embedded-experimentation-and-simulation",
+      "explanation_en": "Evaluation becomes part of the architecture when every major feature can be disabled for ablation, changes are released behind feature flags, A/B tests distinguish mechanism metrics from target metrics, and prompts have deterministic snapshots and CI regressions. When moving to post-training, the verifier becomes the reward, but the environment must withstand millions of episodes, reset reliably, and scale. The chapter calls for independently disableable features, multi-armed A/B variants, guardrail metrics, and separate exposure accounting. Compile-time flags physically exclude internal code; runtime flags support rollout and circuit breaking. AWorld provides a sandbox with 26 MCP servers and 126 tools and reduces the demonstrated serial runtime from 7,695 to 525 seconds; RoboTwin2 adds physics, Action Chunking, and domain randomization. Extrapolation: A unified reset/step/observe/verify environment interface makes it easier to reuse scenarios across CI, offline evaluation, and RL without mixing a closed test set into training data.",
+      "analogy_en": "The same proving ground first serves as an examination and, after its reset and throughput are strengthened, becomes a training arena.",
+      "visual_title_en": "Visual Model: Embedded Experimentation Infrastructure and Simulation Environments"
+    }
+  ]
+}

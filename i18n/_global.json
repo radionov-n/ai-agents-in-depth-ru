@@ -1,0 +1,257 @@
+{
+  "summary_en": "The book treats an agent as a system composed of a model, context, and tools, whose capabilities are determined not only by the LLM's weights but also by its engineering harness. Context, memory, and knowledge define the observable view of the world; tools and code turn decisions into verifiable actions; evaluation and post-training connect behavior to measurable improvement. Self-evolution, multimodal interaction, and teams of agents extend this foundation while introducing new risks involving latency, access, cascading errors, and the accumulation of poor experience. The main practical conclusion is to design observation, action, and verification as a single reproducible loop in which the model and harness evolve together.",
+  "glossary": [
+    {
+      "term_en": "Agent",
+      "definition_en": "A system in which a language model makes decisions based on context and acts through tools."
+    },
+    {
+      "term_en": "ReAct",
+      "definition_en": "An iterative reasoning–action–observation loop that forms an agent's trajectory."
+    },
+    {
+      "term_en": "Harness",
+      "definition_en": "The execution layer around a model: state, tools, constraints, verification, recovery, and observability."
+    },
+    {
+      "term_en": "Workflow",
+      "definition_en": "A graph of steps predefined in code, in which the model solves only local subtasks."
+    },
+    {
+      "term_en": "Context Engineering",
+      "definition_en": "The design of which messages, instructions, knowledge, and results are available to the model at decision time."
+    },
+    {
+      "term_en": "KV Cache",
+      "definition_en": "A cache of internal representations for a token prefix that reduces repeated computation when the beginning of the context remains unchanged."
+    },
+    {
+      "term_en": "Prompt Injection",
+      "definition_en": "An attempt to turn untrusted external data into instructions that alter an agent's behavior."
+    },
+    {
+      "term_en": "Agent Skill",
+      "definition_en": "An on-demand package of instructions, references, templates, and scripts for domain-specific work."
+    },
+    {
+      "term_en": "User Memory",
+      "definition_en": "An editable cross-session model of persistent facts, preferences, relationships, and user processes."
+    },
+    {
+      "term_en": "Retrieval-Augmented Generation (RAG)",
+      "definition_en": "Generating a response after retrieving relevant evidence from an external corpus."
+    },
+    {
+      "term_en": "Hybrid Retrieval",
+      "definition_en": "The combined use of semantic dense retrieval and exact sparse retrieval, followed by candidate fusion."
+    },
+    {
+      "term_en": "Agent–Computer Interface (ACI)",
+      "definition_en": "A tool interface designed around the goals, limitations, and error patterns of a language model."
+    },
+    {
+      "term_en": "Model Context Protocol (MCP)",
+      "definition_en": "A standard for interaction between a client and servers that provide tools, resources, and prompts."
+    },
+    {
+      "term_en": "Event-Driven Agent",
+      "definition_en": "An agent whose work is initiated and interrupted by messages, callbacks, timers, and the results of background operations."
+    },
+    {
+      "term_en": "Coding Agent",
+      "definition_en": "An agent that uses code, a terminal, and a filesystem as a general environment for solving and verifying tasks."
+    },
+    {
+      "term_en": "LLM-as-a-Judge",
+      "definition_en": "The use of a language model to evaluate a response against an explicit rubric and calibrated examples."
+    },
+    {
+      "term_en": "Ablation",
+      "definition_en": "The controlled removal or replacement of a component to reveal its causal contribution to the result."
+    },
+    {
+      "term_en": "Statistical Significance",
+      "definition_en": "An assessment of how compatible an observed difference is with random variation in the results."
+    },
+    {
+      "term_en": "Supervised Fine-Tuning (SFT)",
+      "definition_en": "Fine-tuning a model by imitating labeled demonstrations of correct behavior."
+    },
+    {
+      "term_en": "Reinforcement Learning from Human Feedback (RLHF)",
+      "definition_en": "Optimizing a policy using a preference signal derived from human comparisons or a reward model."
+    },
+    {
+      "term_en": "Credit Assignment",
+      "definition_en": "Determining which steps in a multi-step trajectory deserve a positive or negative signal."
+    },
+    {
+      "term_en": "Externalized Learning",
+      "definition_en": "Storing acquired experience in external knowledge, skills, and tools without changing the model's weights."
+    },
+    {
+      "term_en": "System Prompt Learning",
+      "definition_en": "The controlled refinement of textual system-prompt rules based on edge cases and feedback."
+    },
+    {
+      "term_en": "Proactive Tool Discovery",
+      "definition_en": "Discovering a required capability on demand when the gap becomes apparent during task execution."
+    },
+    {
+      "term_en": "Full-Duplex Interaction",
+      "definition_en": "Simultaneous processing of incoming and outgoing streams without a fixed sequence of conversational turns."
+    },
+    {
+      "term_en": "Visual Grounding",
+      "definition_en": "Mapping a language reference to an interface element onto its identifier or screen coordinates."
+    },
+    {
+      "term_en": "Vision-Language-Action Model (VLA)",
+      "definition_en": "A model that transforms visual observations and language instructions into robot actions."
+    },
+    {
+      "term_en": "Agent2Agent Protocol (A2A)",
+      "definition_en": "A protocol for capability discovery and task management between agents across organizational boundaries."
+    },
+    {
+      "term_en": "Context Isolation",
+      "definition_en": "Separating agent histories and state while transferring only explicit handoff packages and artifacts."
+    }
+  ],
+  "qa": [
+    {
+      "id": "q-agent-formula",
+      "question_en": "What three components make up the minimal agent formula, and what boundary does each component define?",
+      "expected_answer_points_en": [
+        "The LLM makes decisions and plans.",
+        "Context determines what the model can see.",
+        "Tools determine what the system can do."
+      ]
+    },
+    {
+      "id": "q-react-trajectory",
+      "question_en": "Why must a tool result be returned to the ReAct trajectory before the next decision?",
+      "expected_answer_points_en": [
+        "The next decision must be based on an actual observation.",
+        "Without the result, the model may repeat the action blindly or fabricate success."
+      ]
+    },
+    {
+      "id": "q-stable-prefix",
+      "question_en": "What breaks KV/Prompt Cache reuse, and how should changing state be separated?",
+      "expected_answer_points_en": [
+        "Any change to the early token prefix invalidates the cache.",
+        "Stable instructions and tools remain at the beginning.",
+        "Time and runtime state are placed at the end or in the Status Bar."
+      ]
+    },
+    {
+      "id": "q-hybrid-retrieval",
+      "question_en": "Why does RAG need both dense and sparse retrieval if each already returns relevant documents?",
+      "expected_answer_points_en": [
+        "Dense retrieval finds semantic paraphrases.",
+        "Sparse retrieval precisely captures names, codes, and rare terms.",
+        "Fusion and reranking compensate for the different errors of the two channels."
+      ]
+    },
+    {
+      "id": "q-aci-choice",
+      "question_en": "When should an agent capability be implemented as a general-purpose tool, and when as a narrow dedicated tool?",
+      "expected_answer_points_en": [
+        "A general-purpose tool reduces the number of interfaces and covers unforeseen cases.",
+        "A narrow tool is needed for special permissions, auditing, complex parameters, or dangerous actions.",
+        "The decision depends on parameter complexity, frequency of change, and model capability."
+      ]
+    },
+    {
+      "id": "q-eval-process-outcome",
+      "question_en": "Why is a final success metric alone insufficient for diagnosing an agent?",
+      "expected_answer_points_en": [
+        "It does not show where the trajectory failed.",
+        "Process metrics are needed: tool selection, number of steps, errors, and cost.",
+        "Observability must connect a failure to a regression test."
+      ]
+    },
+    {
+      "id": "q-sft-vs-rl",
+      "question_en": "How do the roles of SFT and RL differ in agent post-training?",
+      "expected_answer_points_en": [
+        "SFT imitates demonstrations and establishes the format and initial policy.",
+        "RL explores alternatives and optimizes a verifiable reward.",
+        "RL is especially useful for strategies that do not appear verbatim in the demonstrations."
+      ]
+    },
+    {
+      "id": "q-external-carrier",
+      "question_en": "Where should a new fact, a frequently used parameterized procedure, and a changing strategic process be stored?",
+      "expected_answer_points_en": [
+        "Store a fact in the knowledge base.",
+        "Store a frequently used exact procedure in a code tool.",
+        "Store a changing strategy in a Skill."
+      ]
+    },
+    {
+      "id": "q-voice-paradigms",
+      "question_en": "What assumption distinguishes an Omni voice model from a Full-Duplex model?",
+      "expected_answer_points_en": [
+        "Omni integrates ASR, LLM, and TTS but usually retains turn-taking and endpointing.",
+        "Full-Duplex listens and speaks continuously without dividing the conversation into rigid turns."
+      ]
+    },
+    {
+      "id": "q-context-sharing",
+      "question_en": "When is shared context more useful than isolation, and when does it become an architectural risk?",
+      "expected_answer_points_en": [
+        "Shared context is needed when losing details would be critical and the chain of roles is short and tightly coupled.",
+        "Isolation is needed for many parallel tasks, large context windows, and security requirements.",
+        "A hybrid switches to explicit handoff after saturation."
+      ]
+    },
+    {
+      "id": "q-new-information",
+      "question_en": "Why might several agents discussing the same text fail to outperform one agent given equal compute?",
+      "expected_answer_points_en": [
+        "They introduce no new information.",
+        "Sequentially passing summaries can lose details.",
+        "The advantage emerges with execution, rendering, tools, or independent source feedback."
+      ]
+    },
+    {
+      "id": "q-fast-slow-safety",
+      "question_en": "How can a fast voice loop for Computer Use be prevented from presenting an intention as a completed action?",
+      "expected_answer_points_en": [
+        "The executor maintains explicit rolling status.",
+        "The Fast Agent does not say “done” without confirmed completion.",
+        "For irreversible actions, planned, executed, observed, and verified are distinguished."
+      ]
+    },
+    {
+      "id": "q-action-chunking",
+      "question_en": "How does Action Chunking both improve and degrade robot control?",
+      "expected_answer_points_en": [
+        "An action block hides inference latency and makes motion smooth.",
+        "A long block cannot incorporate new observations before it finishes.",
+        "Adaptive length and interruption on a dangerous state divergence are required."
+      ]
+    },
+    {
+      "id": "q-cascade-error",
+      "question_en": "Why can agreement among multiple agents amplify an error, and how can the cascade be broken?",
+      "expected_answer_points_en": [
+        "Downstream agents inherit the false initial claim.",
+        "Repetition increases apparent confidence but not truthfulness.",
+        "Independent verification against the original evidence and deterministic tests or queries is required."
+      ]
+    },
+    {
+      "id": "q-coevolution-flywheel",
+      "question_en": "Describe the model–Harness co-evolution flywheel and explain why the Harness never disappears completely.",
+      "expected_answer_points_en": [
+        "Real tasks expose model weaknesses.",
+        "The Harness addresses them and creates observable training and evaluation signals.",
+        "The model internalizes stable patterns, and the old layer is removed.",
+        "New capability frontiers create new unreliable boundaries and a new Harness."
+      ]
+    }
+  ]
+}

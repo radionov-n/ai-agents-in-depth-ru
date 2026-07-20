@@ -1,0 +1,22 @@
+AI Agents in Depth — Russian Interactive Deep-Dive
+Copyright 2026 Nikita Radionov
+
+This educational derivative work is based on:
+
+AI Agents in Depth: Design Principles and Engineering Practice
+Copyright 2025 Bojie Li
+https://github.com/bojieli/ai-agent-book
+Licensed under the Apache License, Version 2.0.
+
+The English translation used as the source for this Russian adaptation is
+identified by the upstream project as a community contribution by Devaraj.
+
+Modifications include Russian technical translation and adaptation, thematic
+summaries, explanations, diagrams, glossary entries, active-recall questions,
+source notes, and a bilingual interactive HTML presentation. This is not an
+official Russian edition of the book.
+
+The workflow was created with an adapted version of the book-deepdive skill
+from mldogs/skill-factory:
+https://github.com/mldogs/skill-factory
+The upstream skill-factory project is licensed separately under the MIT License.
