@@ -89,6 +89,7 @@
                 "Act",
                 "Observe"
               ],
+              "center": "Trajectory",
               "cap": "Trajectory grows each turn"
             },
             "title_ru": "Визуальная модель: Цикл ReAct и траектория агента",
@@ -103,8 +104,16 @@
           "quote_en": "Agent = LLM + [Context + Tools + Constrain + Verify + Correct] = Model + Harness",
           "visual": {
             "type": "css",
-            "component": "floor_ceiling",
-            "params": null,
+            "component": "layers",
+            "params": {
+              "mode": "nested",
+              "layers": [
+                "Constrain • Verify • Correct",
+                "Context + Tools",
+                "Model"
+              ],
+              "cap": "Harness makes model actions reliable"
+            },
             "title_ru": "Визуальная модель: Модель и инженерная обвязка harness",
             "spec": "Концентрические слои: Model в центре; Context и Tools вокруг; внешний защитный пояс из Constrain, Verify и Correct с обратной стрелкой восстановления."
           }
@@ -117,11 +126,13 @@
           "quote_en": "When building an LLM application, go from simple to complex.",
           "visual": {
             "type": "css",
-            "component": "gauge",
+            "component": "tracks",
             "params": {
-              "left": "Workflow",
-              "right": "Agent",
-              "cap": "Choose autonomy by uncertainty"
+              "tracks": [
+                {"label": "Workflow", "steps": ["Plan", "Run", "Done"]},
+                {"label": "Agent", "steps": ["Observe", "Act", "Adapt"]}
+              ],
+              "cap": "Choose autonomy by uncertainty; hybridize when needed"
             },
             "title_ru": "Визуальная модель: Детерминированный workflow и автономный агент",
             "spec": "Сравнение двух дорожек: слева фиксированный линейный граф workflow, справа ветвящийся feedback-loop автономного агента; между ними гибридная зона."
@@ -135,13 +146,15 @@
           "quote_en": "Think of guardrails as defense in depth.",
           "visual": {
             "type": "svg",
-            "component": "principles",
+            "component": "flow",
             "params": {
-              "parent": "Safety",
-              "kids": [
+              "steps": [
+                "Input gate",
                 "Constrain",
+                "Execute",
                 "Verify",
-                "Correct"
+                "Correct",
+                "Human"
               ],
               "cap": "Independent protection layers"
             },
@@ -168,10 +181,11 @@
           "quote_en": "each call is stateless; all information the model needs must be fully provided",
           "visual": {
             "type": "svg",
-            "component": "many_to_one",
+            "component": "flow",
             "params": {
-              "target": "Context",
-              "cap": "Messages form observable state"
+              "steps": ["User", "Model", "Tool call", "Harness", "Result", "Model"],
+              "feedback": "trajectory",
+              "cap": "Messages form the observable state"
             },
             "title_ru": "Визуальная модель: структура контекста на уровне API",
             "spec": "Вертикальная лента messages с цветовой кодировкой ролей и циклом model → tool call → harness → tool result → model."
@@ -185,12 +199,12 @@
           "quote_en": "once the system prompt is set, don’t change it",
           "visual": {
             "type": "css",
-            "component": "split",
+            "component": "tracks",
             "params": {
-              "left": "Stable prefix",
-              "right": "Dynamic tail",
-              "left_good": true,
-              "right_good": true,
+              "tracks": [
+                {"label": "Cache hit", "steps": ["Stable", "Dynamic tail"]},
+                {"label": "Recompute", "steps": ["Changed byte", "New suffix"]}
+              ],
               "cap": "Keep cache-breaking data at the end"
             },
             "title_ru": "Визуальная модель: контекст, дружественный к KV/Prompt Cache",
@@ -205,8 +219,13 @@
           "quote_en": "Prompt Injection is a core threat to Agent security.",
           "visual": {
             "type": "svg",
-            "component": "bridge",
-            "params": null,
+            "component": "gate_flow",
+            "params": {
+              "steps": ["Policy", "User", "External", "Gate", "Action"],
+              "gate": 3,
+              "blocked": "prompt injection",
+              "cap": "External content is data; execution passes through a gate"
+            },
             "title_ru": "Визуальная модель: исполняемые промпты и границы доверия",
             "spec": "Схема зон доверия: system policy → user intent → tagged external data → execution gate, с красным маршрутом инъекции, остановленным у permission/sandbox слоя."
           }
@@ -219,9 +238,9 @@
           "quote_en": "Skills adopt the design philosophy of Progressive Disclosure",
           "visual": {
             "type": "svg",
-            "component": "tree",
+            "component": "flow",
             "params": {
-              "variant": "descend",
+              "steps": ["Metadata", "SKILL.md", "Select refs", "Run script"],
               "cap": "Metadata → workflow → resources"
             },
             "title_ru": "Визуальная модель: агентные skills и прогрессивное раскрытие",
@@ -236,8 +255,9 @@
           "quote_en": "in-context learning is more like retrieval than reasoning",
           "visual": {
             "type": "svg",
-            "component": "funnel",
+            "component": "flow",
             "params": {
+              "steps": ["Raw trace", "Aggregate", "Status", "Next action"],
               "cap": "Raw trajectory → explicit state"
             },
             "title_ru": "Визуальная модель: статус-бар агента и дистилляция контекста",
@@ -252,12 +272,12 @@
           "quote_en": "Compression is Understanding",
           "visual": {
             "type": "css",
-            "component": "split",
+            "component": "tracks",
             "params": {
-              "left": "Compress",
-              "right": "Isolate",
-              "left_good": true,
-              "right_good": true,
+              "tracks": [
+                {"label": "Compress", "steps": ["Tool output", "Summary"]},
+                {"label": "Isolate", "steps": ["Raw corpus", "Finding"]}
+              ],
               "cap": "Two ways to raise information density"
             },
             "title_ru": "Визуальная модель: контекстно-зависимое сжатие и изоляция субагентов",
@@ -283,9 +303,11 @@
           "quote_en": "The former is a log, the latter is an archive.",
           "visual": {
             "type": "svg",
-            "component": "tree",
+            "component": "matrix",
             "params": {
-              "variant": "descend",
+              "rows": ["Trajectory", "Memory", "Business"],
+              "cols": ["Notes", "JSON", "Code"],
+              "marks": [[true, false, false], [true, true, false], [false, true, true]],
               "cap": "Log → cards → executable state"
             },
             "title_ru": "Визуальная модель: Иерархическая пользовательская память и форматы хранения",
@@ -300,15 +322,17 @@
           "quote_en": "retrieval must filter based on the caller’s permissions, ensuring that unauthorized documents never enter a user’s context.",
           "visual": {
             "type": "svg",
-            "component": "cycle",
+            "component": "flow",
             "params": {
-              "nodes": [
-                "Record",
-                "Review",
+              "steps": [
+                "Ingest",
+                "Classify PII",
                 "Version",
-                "Prune"
+                "Tenant ACL",
+                "Retrieve",
+                "Context"
               ],
-              "cap": "Memory needs a lifecycle"
+              "cap": "Filter before retrieval reaches model context"
             },
             "title_ru": "Визуальная модель: Управление жизненным циклом, приватностью и доступом",
             "spec": "Конвейер governance: ingest → classify PII → version/effective dates → tenant ACL filter → retrieval → context, с красным запретом на фильтрацию после контекста."
@@ -322,9 +346,11 @@
           "quote_en": "no single retrieval strategy is reliable everywhere.",
           "visual": {
             "type": "svg",
-            "component": "many_to_one",
+            "component": "converge",
             "params": {
-              "target": "Reranker",
+              "inputs": ["Dense", "BM25"],
+              "core": "RRF",
+              "outputs": ["Rerank", "Top-k"],
               "cap": "Dense + sparse candidates"
             },
             "title_ru": "Визуальная модель: Гибридное плотное и разреженное извлечение с нейронным переранжированием",
@@ -339,9 +365,13 @@
           "quote_en": "Spend somewhat more compute; buy better retrieval quality.",
           "visual": {
             "type": "svg",
-            "component": "tree",
+            "component": "tracks",
             "params": {
-              "variant": "grow",
+              "tracks": [
+                {"label": "RAPTOR", "steps": ["Chunks", "Tree", "Summary"]},
+                {"label": "GraphRAG", "steps": ["Entities", "Graph", "Community"]},
+                {"label": "Files", "steps": ["Path", "L1", "L2"]}
+              ],
               "cap": "Hierarchy, graph, and linked files"
             },
             "title_ru": "Визуальная модель: Структурированное индексирование и файловая парадигма",
@@ -356,13 +386,12 @@
           "quote_en": "Agentic RAG is the researcher who keeps returning to different shelves, adjusting search strategies, and cross-checking sources—starting to write only once the material is in hand.",
           "visual": {
             "type": "svg",
-            "component": "cycle",
+            "component": "layers",
             "params": {
-              "nodes": [
-                "Query",
-                "Retrieve",
-                "Check",
-                "Refine"
+              "layers": [
+                "Always-visible JSON Cards",
+                "Searchable context chunks",
+                "ReAct: query • check • refine"
               ],
               "cap": "Search becomes an agent loop"
             },
@@ -378,8 +407,9 @@
           "quote_en": "An Agent doesn’t have to treat the knowledge base as a static repository for retrieval only—it can first “read” the data, distill structured decision logic, and then answer questions based on that logic.",
           "visual": {
             "type": "svg",
-            "component": "funnel",
+            "component": "flow",
             "params": {
+              "steps": ["Cases", "JSON schema", "Features", "Clusters", "Factors", "Questions", "Evidence"],
               "cap": "Cases → factors → prototypes"
             },
             "title_ru": "Визуальная модель: Открытие знаний в массивах данных",
@@ -405,12 +435,11 @@
           "quote_en": "General tools are preferable to dedicated tools",
           "visual": {
             "type": "css",
-            "component": "split",
+            "component": "matrix",
             "params": {
-              "left": "General tool",
-              "right": "Dedicated tool",
-              "left_good": true,
-              "right_good": true,
+              "rows": ["Stable", "Changing"],
+              "cols": ["General", "Dedicated"],
+              "marks": [[false, true], [true, false]],
               "cap": "Match interface to risk and complexity"
             },
             "title_ru": "Визуальная модель: Проектирование интерфейса «агент — компьютер»",
@@ -425,9 +454,9 @@
           "quote_en": "MCP solves interoperability (develop once, use everywhere), while Skills solve choice overload",
           "visual": {
             "type": "svg",
-            "component": "many_to_one",
+            "component": "layers",
             "params": {
-              "target": "On demand",
+              "layers": ["Model window: selected tools", "Searchable catalog • Skills", "MCP servers • trust boundaries"],
               "cap": "Interoperability without tool overload"
             },
             "title_ru": "Визуальная модель: MCP, навыки и динамическое обнаружение инструментов",
@@ -450,6 +479,7 @@
                 "Act",
                 "Complete"
               ],
+              "center": "queue / cancel",
               "cap": "World can interrupt the agent"
             },
             "title_ru": "Визуальная модель: Событийный асинхронный агент",
@@ -467,11 +497,14 @@
             "component": "cycle",
             "params": {
               "nodes": [
-                "Inspect",
+                "Design",
                 "Edit",
+                "Run",
                 "Test",
-                "Repair"
+                "Repair",
+                "Review"
               ],
+              "center": "Harness",
               "cap": "Filesystem-backed verified work"
             },
             "title_ru": "Визуальная модель: Coding Agent, файловая система и инженерия Harness",
@@ -486,12 +519,12 @@
           "quote_en": "code is not merely a tool for writing programs—it is the language of an Agent’s formalized thinking and precise expression.",
           "visual": {
             "type": "css",
-            "component": "split",
+            "component": "tracks",
             "params": {
-              "left": "Natural language",
-              "right": "Executable rule",
-              "left_good": false,
-              "right_good": true,
+              "tracks": [
+                {"label": "Reason", "steps": ["NL", "Model", "Solver", "Verify"]},
+                {"label": "Policy", "steps": ["Prompt", "Params", "Truth", "Gate"]}
+              ],
               "cap": "Explain with text, guard with code"
             },
             "title_ru": "Визуальная модель: Код как формальное мышление и исполняемая политика",
@@ -510,8 +543,10 @@
             "params": {
               "center": "Code",
               "roles": [
+                "Thinking",
+                "Policy",
+                "Media",
                 "Adapter",
-                "Artifact",
                 "UI",
                 "Agent"
               ],
@@ -540,8 +575,15 @@
           "quote_en": "the object of evaluation should not be just the model, but the combination of the model and the Harness.",
           "visual": {
             "type": "svg",
-            "component": "arch",
-            "params": null,
+            "component": "tracks",
+            "params": {
+              "tracks": [
+                {"label": "Tool eval", "steps": ["Task", "Tool", "Verifier"]},
+                {"label": "HCI eval", "steps": ["Task", "User sim", "State"]},
+                {"label": "Evidence", "steps": ["Trajectory", "Final state"]}
+              ],
+              "cap": "Resettable environment + executable evidence"
+            },
             "title_ru": "Визуальная модель: воспроизводимая среда оценивания",
             "spec": "Два параллельных стенда: tool-calling с executable verifier и human-computer loop с user simulator; оба сходятся в проверку trajectory + final state."
           }
@@ -554,8 +596,13 @@
           "quote_en": "The evaluation environment is the “stage,” and the dataset is the “script.”",
           "visual": {
             "type": "css",
-            "component": "grid_style",
-            "params": null,
+            "component": "matrix",
+            "params": {
+              "rows": ["Capability", "Difficulty", "Scenario"],
+              "cols": ["Normal", "Edge", "Leak"],
+              "marks": [[true, true, true], [true, true, false], [true, true, true]],
+              "cap": "Coverage needs quality gates and anti-leakage checks"
+            },
             "title_ru": "Визуальная модель: проектирование диагностического набора задач",
             "spec": "Матрица dataset coverage: capability × difficulty × scenario × edge case; отдельная полоса quality gates и anti-leakage механизмов."
           }
@@ -568,8 +615,11 @@
           "quote_en": "Pass@k: The probability that at least one of k attempts succeeds",
           "visual": {
             "type": "css",
-            "component": "weights",
+            "component": "converge",
             "params": {
+              "inputs": ["p"],
+              "core": "k trials",
+              "outputs": ["Pass@k", "Pass^k", "McNemar"],
               "cap": "Process and outcome need uncertainty"
             },
             "title_ru": "Визуальная модель: процессно-итоговые метрики и статистическая значимость",
@@ -584,12 +634,10 @@
           "quote_en": "when a metric becomes an optimization target, it ceases to be a good metric.",
           "visual": {
             "type": "css",
-            "component": "split",
+            "component": "flow",
             "params": {
-              "left": "Pointwise",
-              "right": "Pairwise",
-              "left_good": true,
-              "right_good": true,
+              "steps": ["Human gold", "Rubric", "Judge", "Bias audit", "Production"],
+              "feedback": "recalibrate / swap A↔B",
               "cap": "Calibrate the judge to the task"
             },
             "title_ru": "Визуальная модель: LLM-судья по калиброванной рубрике и попарное сравнение",
@@ -608,10 +656,13 @@
             "params": {
               "nodes": [
                 "Trace",
-                "Diagnose",
-                "Test",
+                "Cluster",
+                "Hypothesis",
+                "Eval",
+                "Deploy",
                 "Regress"
               ],
+              "center": "Evidence",
               "cap": "Observations become durable tests"
             },
             "title_ru": "Визуальная модель: наблюдаемость агента и обратная связь с оцениванием",
@@ -626,10 +677,10 @@
           "quote_en": "The endpoint of evaluation is not scoring, but improvement.",
           "visual": {
             "type": "svg",
-            "component": "spiral",
+            "component": "flow",
             "params": {
-              "variant": "single",
-              "cap": "Hypothesis → experiment → evidence"
+              "steps": ["Benchmark", "Ablation", "CI", "Simulation", "Reward"],
+              "cap": "Evaluation infrastructure matures into training infrastructure"
             },
             "title_ru": "Визуальная модель: встроенная экспериментальная инфраструктура и симуляционные среды",
             "spec": "Лестница зрелости: benchmark → ablation/A-B/flags → CI regression → high-throughput simulation → reward-driven post-training."
@@ -654,8 +705,11 @@
           "quote_en": "The three are not alternatives; they form a pipeline—read first, then watch demonstrations, then practice.",
           "visual": {
             "type": "svg",
-            "component": "pipeline_vs_loop",
-            "params": null,
+            "component": "flow",
+            "params": {
+              "steps": ["Raw corpus", "NTP", "Demos", "SFT", "Task+reward", "RL"],
+              "cap": "Read → imitate → optimize verified outcomes"
+            },
             "title_ru": "Визуальная модель: Pre-training → дообучение с учителем (SFT) → обучение с подкреплением",
             "spec": "Трёхступенчатый поток: raw corpus/NTP → demonstrations/response-masked loss → task+reward/online rollouts; под каждым этапом показать приобретаемую способность, цену и условие перехода."
           }
@@ -668,12 +722,12 @@
           "quote_en": "SFT memorizes, RL generalizes.",
           "visual": {
             "type": "css",
-            "component": "split",
+            "component": "tracks",
             "params": {
-              "left": "SFT",
-              "right": "RL",
-              "left_good": true,
-              "right_good": true,
+              "tracks": [
+                {"label": "SFT", "steps": ["Demo", "Imitate", "ID", "OOD fail"]},
+                {"label": "RL", "steps": ["Explore", "Reward", "Strategy", "OOD transfer"]}
+              ],
               "cap": "Imitate first, optimize next"
             },
             "title_ru": "Визуальная модель: SFT запоминает, RL обобщает",
@@ -688,16 +742,12 @@
           "quote_en": "Don’t stray too far from the starting point, or the reward model’s scores become unreliable.",
           "visual": {
             "type": "svg",
-            "component": "radial_roles",
+            "component": "matrix",
             "params": {
-              "center": "Policy",
-              "roles": [
-                "Human",
-                "Verifier",
-                "Preference",
-                "Judge"
-              ],
-              "cap": "Different reward sources"
+              "rows": ["Human / RM", "Rule verifier"],
+              "cols": ["Online", "Offline"],
+              "marks": [[true, true], [true, false]],
+              "cap": "Reward source and optimization method are independent"
             },
             "title_ru": "Визуальная модель: Источники награды и алгоритмы постобучения",
             "spec": "Матрица 2×2: reward source (human/RM против rule verifier) и optimization (online PPO/GRPO против offline DPO), со стрелкой KL к reference policy и предупреждением reward hacking."
@@ -711,8 +761,11 @@
           "quote_en": "Data quality trumps algorithms.",
           "visual": {
             "type": "svg",
-            "component": "arch",
-            "params": null,
+            "component": "pyramid",
+            "params": {
+              "layers": ["Base-model priors", "Data + environment", "Algorithm tuning"],
+              "cap": "Fix simulator fidelity before tuning the optimizer"
+            },
             "title_ru": "Визуальная модель: Данные и среда важнее алгоритмов",
             "spec": "Пирамида приоритетов: base-model priors в основании, environment fidelity и data quality в центре, algorithm tuning на вершине; рядом разрыв simulator→production."
           }
@@ -727,7 +780,9 @@
             "type": "svg",
             "component": "timeline",
             "params": {
-              "variant": "change"
+              "steps": ["Act 1", "Act 2", "Recover", "Finish"],
+              "outcome": "terminal reward",
+              "cap": "Reward the outcome; verify and penalize the path"
             },
             "title_ru": "Визуальная модель: Распределение кредита в многошаговых задачах и проверяемые сигналы пути",
             "spec": "Длинная trajectory с terminal outcome сверху и локальными path signals у действий; отдельные ветви показывают all-fail zero variance, восстановление penalty и inaction trap без outcome."
@@ -741,13 +796,12 @@
           "quote_en": "Tool use extends the Agent’s capability boundary",
           "visual": {
             "type": "svg",
-            "component": "cycle",
+            "component": "tracks",
             "params": {
-              "nodes": [
-                "Rollout",
-                "Verify",
-                "Reward",
-                "Update"
+              "tracks": [
+                {"label": "SFT", "steps": ["Off-policy", "Dense"]},
+                {"label": "RL", "steps": ["On-policy", "Sparse"]},
+                {"label": "OPD", "steps": ["On-policy", "Teacher", "Dense"]}
               ],
               "cap": "Train on the policy’s own trajectories"
             },
@@ -774,14 +828,11 @@
           "quote_en": "learning does not happen automatically; it must be explicitly designed",
           "visual": {
             "type": "svg",
-            "component": "cycle",
+            "component": "matrix",
             "params": {
-              "nodes": [
-                "Do",
-                "Distill",
-                "Store",
-                "Reuse"
-              ],
+              "rows": ["Context", "Storage", "Weights"],
+              "cols": ["Fast", "Durable", "Visible"],
+              "marks": [[true, false, true], [true, true, true], [false, true, false]],
               "cap": "Learning outside model weights"
             },
             "title_ru": "Визуальная модель: Внешнее обучение",
@@ -796,9 +847,12 @@
           "quote_en": "procedural memory needs a verification gate, or the self-improvement loop decays",
           "visual": {
             "type": "svg",
-            "component": "spiral",
+            "component": "tracks",
             "params": {
-              "variant": "single",
+              "tracks": [
+                {"label": "Success", "steps": ["Run", "Summary", "Replay", "Library"]},
+                {"label": "Failure", "steps": ["Error", "Reflect", "Rule", "Retry"]}
+              ],
               "cap": "Verified experience compounds"
             },
             "title_ru": "Визуальная модель: Дистилляция опыта и проверенная процедурная память",
@@ -813,13 +867,12 @@
           "quote_en": "Skills convert domain knowledge trapped in unstructured documents into a structured form Agents can readily use",
           "visual": {
             "type": "svg",
-            "component": "cycle",
+            "component": "tracks",
             "params": {
-              "nodes": [
-                "Gather",
-                "Merge",
-                "Prune",
-                "Index"
+              "tracks": [
+                {"label": "Day", "steps": ["Signals", "Inbox"]},
+                {"label": "Night", "steps": ["Gather", "Merge", "Prune", "Index"]},
+                {"label": "Skill", "steps": ["Metadata", "Workflow", "Refs"]}
               ],
               "cap": "Background memory consolidation"
             },
@@ -837,7 +890,9 @@
             "type": "svg",
             "component": "timeline",
             "params": {
-              "variant": "change"
+              "steps": ["Edge case", "Postmortem", "Prompt diff", "Check", "Eval", "Approve", "Version"],
+              "outcome": "rollback-ready",
+              "cap": "Every rule change stays testable and reversible"
             },
             "title_ru": "Визуальная модель: Обучение системного промпта",
             "spec": "Edge case → natural-language post-mortem → targeted prompt diff → contradiction check → retained eval → human approval → versioned prompt, с rollback-стрелкой."
@@ -851,9 +906,12 @@
           "quote_en": "the Agent declares the gap; the system injects on demand.",
           "visual": {
             "type": "svg",
-            "component": "tree",
+            "component": "tracks",
             "params": {
-              "variant": "descend",
+              "tracks": [
+                {"label": "Tools", "steps": ["Gap", "Server", "Tool", "Schema"]},
+                {"label": "Skills", "steps": ["Gap", "Catalog", "Read", "Script"]}
+              ],
               "cap": "Server → tool → schema"
             },
             "title_ru": "Визуальная модель: Проактивное обнаружение инструментов",
@@ -868,9 +926,10 @@
           "quote_en": "Minimal Predefinition, Maximal Self-Evolution",
           "visual": {
             "type": "svg",
-            "component": "tree",
+            "component": "cycle",
             "params": {
-              "variant": "grow",
+              "nodes": ["Need", "Find/create", "Sandbox", "Gate", "Register", "Reuse"],
+              "center": "Capability",
               "cap": "Created tools unlock harder tasks"
             },
             "title_ru": "Визуальная модель: Создание инструментов и непрерывное накопление возможностей",
@@ -896,8 +955,15 @@
           "quote_en": "it simply drops the turn-taking assumption and lets the model listen and speak continuously, at the same time.",
           "visual": {
             "type": "svg",
-            "component": "pipeline_vs_loop",
-            "params": null,
+            "component": "tracks",
+            "params": {
+              "tracks": [
+                {"label": "Cascade", "steps": ["VAD", "ASR", "LLM", "TTS"]},
+                {"label": "Streaming", "steps": ["Partial", "Generate", "Speak"]},
+                {"label": "Duplex", "steps": ["Listen", "Think", "Speak", "Listen"]}
+              ],
+              "cap": "From turn-taking pipeline to simultaneous listen + speak"
+            },
             "title_ru": "Визуальная модель: Каскадная, сквозная омнимодальная и полнодуплексная архитектуры голосового агента",
             "spec": "Три горизонтальные временные шкалы: последовательные блоки VAD–ASR–LLM–TTS; перекрывающиеся потоковые блоки; два параллельных аудиопотока полного дуплекса. Поверх шкал показать задержку первого звука и место, где исчезает граница хода."
           }
@@ -910,12 +976,13 @@
           "quote_en": "The bridge pays off only where the slow thinker is genuinely better than the fast reactor",
           "visual": {
             "type": "css",
-            "component": "split",
+            "component": "tracks",
             "params": {
-              "left": "Fast",
-              "right": "Slow",
-              "left_good": true,
-              "right_good": true,
+              "tracks": [
+                {"label": "Independent", "steps": ["Fast", "Slow", "Conflict"]},
+                {"label": "Advisor", "steps": ["Slow", "Status", "Fast"]},
+                {"label": "MPS", "steps": ["Formulate", "Articulate", "Sync"]}
+              ],
               "cap": "Coordinate latency and depth"
             },
             "title_ru": "Визуальная модель: Архитектуры быстрого и медленного мышления и латентный мост",
@@ -953,8 +1020,15 @@
           "quote_en": "Crucially, the fast Agent must never say “done” until the status summary confirms completion.",
           "visual": {
             "type": "svg",
-            "component": "channel",
-            "params": null,
+            "component": "tracks",
+            "params": {
+              "tracks": [
+                {"label": "Voice", "steps": ["Hear", "Reply 0.58s"]},
+                {"label": "Computer", "steps": ["Plan", "Act", "Verify"]},
+                {"label": "Status", "steps": ["Step", "Missing", "Done gate"]}
+              ],
+              "cap": "Fast conversation never claims completion before verification"
+            },
             "title_ru": "Визуальная модель: Развязка быстрого и медленного контуров для Computer Use в реальном времени",
             "spec": "Две параллельные дорожки: Fast Voice Agent с ответами около 0,58 с и Slow Computer-Use Agent с действиями; между ними карточка rolling status с полями current step, missing input, completion. Красная блокировка на слове done до подтверждения."
           }
@@ -967,10 +1041,10 @@
           "quote_en": "long-horizon planning handles “what to do,” and VLA control handles “how to do it.”",
           "visual": {
             "type": "svg",
-            "component": "tree",
+            "component": "layers",
             "params": {
-              "variant": "descend",
-              "cap": "Planner → VLA → action chunk"
+              "layers": ["Planner 0.1–1 Hz", "VLA 1–10 Hz • action chunk", "Controller 50+ Hz • interrupt"],
+              "cap": "Chunk length trades smoothness for reactivity"
             },
             "title_ru": "Визуальная модель: Иерархия планирования и управления; генерация блоков действий (Action Chunking)",
             "spec": "Иерархия частот: планировщик 0,1–1 Гц выдаёт подцель, VLA 1–10 Гц генерирует chunk, контроллер 50 Гц исполняет точки. Ползунок длины chunk показывает обмен smoothness ↔ reactivity и аварийный interrupt."
@@ -984,8 +1058,13 @@
           "quote_en": "simulation can never perfectly reproduce real-world physics, visuals, and hardware",
           "visual": {
             "type": "svg",
-            "component": "bridge",
-            "params": null,
+            "component": "converge",
+            "params": {
+              "inputs": ["20+ robots", "Simulation", "Real demos"],
+              "core": "VLA",
+              "outputs": ["Robot A", "Robot B", "Real world"],
+              "cap": "Cross-embodiment learning + calibrated Sim2Real ranges"
+            },
             "title_ru": "Визуальная модель: Обобщение между робототехническими платформами и перенос из симуляции в реальность",
             "spec": "Два связанных моста: слева cross-embodiment — данные 20+ платформ сходятся в общую VLA-модель и расходятся к конкретным роботам; справа Sim2Real — калиброванные диапазоны physics/visual/dynamics накрывают точку реального мира."
           }
@@ -1009,12 +1088,12 @@
           "quote_en": "If the expected cumulative context exceeds 50% of the window (a heuristic, not an exact threshold), don’t share.",
           "visual": {
             "type": "css",
-            "component": "split",
+            "component": "tracks",
             "params": {
-              "left": "Shared",
-              "right": "Isolated",
-              "left_good": true,
-              "right_good": true,
+              "tracks": [
+                {"label": "Shared", "steps": ["Shared trace", "Context grows", "Saturation"]},
+                {"label": "Isolated", "steps": ["Branches", "Handoff", "Focused"]}
+              ],
               "cap": "Choose losslessness or focus"
             },
             "title_ru": "Визуальная модель: Общий контекст и изоляция контекстов",
@@ -1029,14 +1108,9 @@
           "quote_en": "The answer is structured summaries rather than full trajectories",
           "visual": {
             "type": "svg",
-            "component": "radial_roles",
+            "component": "topologies",
             "params": {
-              "center": "Task",
-              "roles": [
-                "Peer",
-                "Manager",
-                "Handoff"
-              ],
+              "labels": ["Peer", "Manager", "Handoff"],
               "cap": "Control can live in different places"
             },
             "title_ru": "Визуальная модель: Равноправная, менеджерская и децентрализованная топологии",
@@ -1051,8 +1125,14 @@
           "quote_en": "Does the collaboration introduce new information that a single Agent could not obtain during generation?",
           "visual": {
             "type": "css",
-            "component": "budget",
-            "params": null,
+            "component": "decision_curve",
+            "params": {
+              "same": "Same info",
+              "new": "New signal",
+              "single": "1 agent",
+              "multi": "Multi-agent",
+              "cap": "Scale only when marginal information gain exceeds cost"
+            },
             "title_ru": "Визуальная модель: Критерий прироста информации и бюджетно-осознанное масштабирование",
             "spec": "Decision funnel: same information → single agent; new external signal/parallel independent work → multi-agent; затем budget curve exploration → exploitation с cost/gain frontier."
           }
@@ -1065,8 +1145,15 @@
           "quote_en": "MCP addresses interoperability between Agents and tools, while A2A addresses interoperability between Agents and Agents.",
           "visual": {
             "type": "svg",
-            "component": "channel",
-            "params": null,
+            "component": "layers",
+            "params": {
+              "layers": [
+                "Control: bus • states • cancel/ack",
+                "Data: mounts • paths • permissions",
+                "A2A: gateway across trust domains"
+              ],
+              "cap": "Separate durable artifacts from coordination messages"
+            },
             "title_ru": "Визуальная модель: Плоскости данных и управления и межагентная совместимость A2A",
             "spec": "Двухслойная архитектура: data plane с четырьмя mounts и path references; control plane с message bus, state machines и cancel/ack; справа A2A gateway между trust domains."
           }
@@ -1079,10 +1166,12 @@
           "quote_en": "Cross-validation is the key to breaking this chain.",
           "visual": {
             "type": "svg",
-            "component": "tree",
+            "component": "gate_flow",
             "params": {
-              "variant": "crack",
-              "cap": "One bad root can corrupt the chain"
+              "steps": ["Source", "Glossary", "Agents", "Output"],
+              "gate": 2,
+              "blocked": "independent evidence",
+              "cap": "A cross-check must break the semantic error chain"
             },
             "title_ru": "Визуальная модель: Локализация сбоев и независимая перекрёстная проверка",
             "spec": "Красная цепочка source claim → glossary → agents → final output с ростом confidence; независимая синяя ветка evidence/test пересекает цепь как circuit breaker."
@@ -1096,9 +1185,12 @@
           "quote_en": "This demonstrates true bottom-up emergent coordination, not top-down orchestration.",
           "visual": {
             "type": "svg",
-            "component": "spiral",
+            "component": "tracks",
             "params": {
-              "variant": "double",
+              "tracks": [
+                {"label": "Society", "steps": ["Agents", "Norms", "Emergence"]},
+                {"label": "Co-evolve", "steps": ["Tasks", "Harness", "Eval", "Model"]}
+              ],
               "cap": "Model and Harness move together"
             },
             "title_ru": "Визуальная модель: Общество агентов и коэволюция модели с агентной обвязкой (Harness)",
